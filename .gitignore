@@ -2,3 +2,10 @@
 # Project Exports, Cache and such files
 *.pdf
 *.odt#
+
+# C files 
+*.out
+
+# Zim Files
+#   I'm Not going to upload Gigabytes of Zim files to my account
+*.zim
