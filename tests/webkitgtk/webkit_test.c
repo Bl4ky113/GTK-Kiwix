@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
     strcat(file_str, "index.html");
     g_print(HOME);
     g_print(file_str);
-    webkit_web_view_load_uri(webView, file_str);
+    webkit_web_view_load_uri(webView, "http://localhost:80");
 
     // Make sure that when the browser area becomes visible, it will get mouse
     // and keyboard events
