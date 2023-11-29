@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Generated with glade 3.40.0 -->
 <interface>
-  <requires lib="gtk+" version="3.24"/>
-  <object class="GtkApplicationWindow" id="main-wrapper">
+  <requires lib="gtk" version="4"/>
+  <template class="main_window" parent="GtkWindow">
     <property name="can-focus">False</property>
     <child>
       <object class="GtkBox">
@@ -28,5 +28,5 @@
         </child>
       </object>
     </child>
-  </object>
+  </template>
 </interface>

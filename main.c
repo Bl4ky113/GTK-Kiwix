@@ -17,6 +17,8 @@
 
 // GTK Libs
 #include <gtk/gtk.h>
+#include <gdk/gdk.h>
+#include <gio/gio.h>
 #include <webkit2/webkit2.h>
 
 #include <gtk_gui.h>
