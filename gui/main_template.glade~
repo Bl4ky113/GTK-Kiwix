@@ -55,7 +55,6 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="hexpand">True</property>
-                <property name="vexpand">True</property>
                 <child>
                   <placeholder/>
                 </child>
@@ -63,10 +62,9 @@
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Home</property>
+                    <property name="label" translatable="yes">page 1</property>
                   </object>
                   <packing>
-                    <property name="tab-expand">True</property>
                     <property name="tab-fill">False</property>
                   </packing>
                 </child>
@@ -74,19 +72,29 @@
                   <placeholder/>
                 </child>
                 <child type="tab">
-                  <placeholder/>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">page 2</property>
+                  </object>
+                  <packing>
+                    <property name="position">1</property>
+                    <property name="tab-fill">False</property>
+                  </packing>
                 </child>
                 <child>
                   <placeholder/>
                 </child>
                 <child type="tab">
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child type="tab">
-                  <placeholder/>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">page 3</property>
+                  </object>
+                  <packing>
+                    <property name="position">2</property>
+                    <property name="tab-fill">False</property>
+                  </packing>
                 </child>
               </object>
               <packing>

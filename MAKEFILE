@@ -1,0 +1,13 @@
+
+CC=/bin/gcc
+SHELL=/bin/bash
+
+CFLAGS=$(shell pkg-config --cflags webkit2gtk-4.1)
+LIBS=$(shell pkg-config --libs webkit2gtk-4.1)
+
+CUSTOM_CFLAGS= -I./
+
+gtk-kiwix: main.c gtk_gui.c
+	@echo "\nCompiling\n"
+	$(CC) -o gtk-kiwix main.c gtk_gui.c $(CFLAGS) $(CUSTOM_CFLAGS) $(LIBS)
+	@echo -e "\n\n\t\t\tDONE!!!\n\n"

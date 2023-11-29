@@ -8,8 +8,7 @@ print_hello (GtkWidget *widget,
 }
 
 static void
-activate (GtkApplication *app,
-          gpointer        user_data)
+activate (GtkApplication *app)
 {
   GtkWidget *window;
   GtkWidget *button;
