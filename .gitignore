@@ -2,9 +2,11 @@
 # Project Exports, Cache and such files
 *.pdf
 *.odt#
+*.glade~
 
 # C files 
 *.out
+gtk-kiwix*
 
 # Zim Files
 #   I'm Not going to upload Gigabytes of Zim files to my account
