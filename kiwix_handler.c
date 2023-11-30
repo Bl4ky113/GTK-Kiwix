@@ -21,10 +21,12 @@
 #include <regex.h>
 #include <time.h>
 
-#include <consts.h>
 #include <kiwix_handler.h>
 
+#include <consts.h>
+
 int kiwix_server_port = 0;
+int number_zim_files = 0;
 
 /**
  * Gets the program (gtk-kiwix) process ID
@@ -99,7 +101,7 @@ char **get_zim_files (char *folder_path) {
 	int zim_file_index = 0;
 	int zim_file_counter = 1;
 
-	fprintf(stdout, "GETTING zim file names IN %s FOLDER", folder_path);
+	fprintf(stdout, "GETTING zim file names IN %s FOLDER\n", folder_path);
 
 	sprintf(zim_file_counter_str, "%d", zim_file_counter);
 	zim_files_names[zim_file_index++] = zim_file_counter_str;
@@ -129,6 +131,8 @@ char **get_zim_files (char *folder_path) {
 			zim_files_names = (char **) realloc(zim_files_names, zim_file_counter * 2);
 		}
 	}
+
+	number_zim_files = zim_file_counter;
 
 	sprintf(zim_file_counter_str, "%d", zim_file_counter);
 	zim_files_names[0] = zim_file_counter_str;
@@ -335,6 +339,20 @@ void start_server () {
 	fprintf(stdout, "KIWIX SERVER SUCCESSFULLY DEPLOYED\n");
 
 	return;
+}
+
+/**
+ * Method that refreshes the 'kiwix library file' from the GUI,
+ * checks if there's a file size change and then returns according to the result
+ * @return{int} 0 if there's any change in zim file count. 1 if there's none
+ **/
+int refresh_kiwix_library_file () {
+	char *library_file_path = (char *) malloc(sizeof(char) * PATH_BUFFER);
+
+	library_file_path = "/home/bl4ky/.local/share/gtk-kiwix/library.xml";
+	unlink(library_file_path);
+
+	return 0;
 }
 
 /**

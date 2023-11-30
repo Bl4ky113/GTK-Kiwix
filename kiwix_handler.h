@@ -75,6 +75,13 @@ void start_server ();
 int run_server (int port, int program_pid, char *library_path);
 
 /**
+ * Method that refreshes the 'kiwix library file' from the GUI,
+ * checks if there's a file size change and then returns according to the result
+ * @return{int} 0 if there's any change in zim file count. 1 if there's none
+ **/
+int refresh_kiwix_library_file ();
+
+/**
  * Getter, available for other modules, 
  * for current kiwix server port
  * @return {int} current kiwix server port

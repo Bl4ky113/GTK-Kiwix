@@ -22,11 +22,13 @@
 #define MAIN_TITLE "GTK Implementation of Kiwix"
 
 // Kiwix Server Handler
+#define SERVER_METHOD "http://"
 #define HOSTNAME "localhost"
 // Linux max port is 65.535, but yeah...
 #define KIWIX_SERVER_PORT_MIN 1024
 #define KIWIX_SERVER_PORT_MAX 10000 
 #define PIPE_BUFFER 256
+#define URL_BUFFER 128
 															
 // XDG, INI, Config, Share and MORE Handler
 #define XDG_DATA_HOME ".local/share/gtk-kiwix"
