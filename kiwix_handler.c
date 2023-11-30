@@ -19,7 +19,6 @@
 #include <string.h>
 #include <dirent.h>
 #include <regex.h>
-#include <time.h>
 
 #include <kiwix_handler.h>
 

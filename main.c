@@ -23,7 +23,6 @@
 #include <string.h>
 #include <dirent.h>
 #include <regex.h>
-#include <time.h>
 
 // GTK GUI Libs
 #include <gtk/gtk.h>
@@ -36,13 +35,9 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 
+#include <config_handler.h>
 #include <kiwix_handler.h>
 #include <gtk_gui.h>
-
-// Enviroment Global Variables
-char *XDG_DATA_HOME = "";
-char *XDG_CONFIG_HOME = "";
-char *APP_FOLDER = "gtk-kiwix/";
 
 /**
  * Main function of the Program. 
@@ -55,6 +50,7 @@ char *APP_FOLDER = "gtk-kiwix/";
  **/
 int main (int argc, char **argv) {
 	// Check User Config
+	check_user_config();
 
 	// Start Kiwix Server
 	start_server();

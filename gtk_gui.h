@@ -13,6 +13,22 @@
 #define GTK_GUI_H
 
 /**
+ * Callback for 'button_prev'
+ * Takes WebViewer to the previous url 
+ * in the urls list if available
+ * @return{void}
+ **/
+void cb_get_prev_url ();
+
+/**
+ * Callback for 'button_next'
+ * Takes WebViewer to the next url 
+ * in the urls list if available
+ * @return{void}
+ **/
+void cb_get_next_url ();
+
+/**
  * Callback to any dialog destroy or restard app button.
  * It justs destroys the dialog and the main window
  * @param{GtkWidget *} dialog - dialog where the call came from

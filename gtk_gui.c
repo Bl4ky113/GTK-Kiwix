@@ -48,6 +48,28 @@ void add_webview_to_notebook (GtkWidget *notebook) {
 }
 
 /**
+ * Callback for 'button_prev'
+ * Takes WebViewer to the previous url 
+ * in the urls list if available
+ * @return{void}
+ **/
+void cb_get_prev_url () {
+	change_url_to_previous_url();
+	return;
+}
+
+/**
+ * Callback for 'button_next'
+ * Takes WebViewer to the next url 
+ * in the urls list if available
+ * @return{void}
+ **/
+void cb_get_next_url () {
+	change_url_to_next_url();
+	return;
+}
+
+/**
  * Callback to any dialog destroy or restard app button.
  * It justs destroys the dialog and the main window
  * @param{GtkWidget *} dialog - dialog where the call came from
@@ -131,19 +153,22 @@ void add_content_upper_section (GtkWidget *wrapper) {
 	GtkWidget *button_refresh = NULL;
 
 	buttons_left_wrapper = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
-	button_prev = gtk_button_new_from_icon_name("gtk-go-back", GTK_ICON_SIZE_LARGE_TOOLBAR);
-	button_next = gtk_button_new_from_icon_name("gtk-go-forward", GTK_ICON_SIZE_LARGE_TOOLBAR);
+	/*button_prev = gtk_button_new_from_icon_name("gtk-go-back", GTK_ICON_SIZE_LARGE_TOOLBAR);*/
+	/*button_next = gtk_button_new_from_icon_name("gtk-go-forward", GTK_ICON_SIZE_LARGE_TOOLBAR);*/
 
 	buttons_right_wrapper = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
 	button_menu = gtk_button_new_from_icon_name("gtk-properties", GTK_ICON_SIZE_LARGE_TOOLBAR);
 	button_fullscreen = gtk_button_new_from_icon_name("gtk-fullscreen", GTK_ICON_SIZE_LARGE_TOOLBAR);
 	button_refresh = gtk_button_new_from_icon_name("gtk-refresh", GTK_ICON_SIZE_LARGE_TOOLBAR);
 
+	/*g_signal_connect(button_prev, "clicked", G_CALLBACK(cb_get_prev_url), NULL);*/
+	/*g_signal_connect(button_next, "clicked", G_CALLBACK(cb_get_next_url), NULL);*/
+
 	g_signal_connect(button_fullscreen, "clicked", G_CALLBACK(cb_make_window_fullscreen), NULL);
 	g_signal_connect(button_refresh, "clicked", G_CALLBACK(cb_refresh_library), NULL);
 
-	gtk_box_pack_start(GTK_BOX(buttons_left_wrapper), button_prev, TRUE, TRUE, 2);
-	gtk_box_pack_start(GTK_BOX(buttons_left_wrapper), button_next, TRUE, TRUE, 2);
+	/*gtk_box_pack_start(GTK_BOX(buttons_left_wrapper), button_prev, TRUE, TRUE, 2);*/
+	/*gtk_box_pack_start(GTK_BOX(buttons_left_wrapper), button_next, TRUE, TRUE, 2);*/
 
 	gtk_box_pack_end(GTK_BOX(buttons_right_wrapper), button_menu, TRUE, TRUE, 2);
 	gtk_box_pack_end(GTK_BOX(buttons_right_wrapper), button_fullscreen, TRUE, TRUE, 2);
@@ -179,7 +204,7 @@ void add_layout_gui (GtkWidget *main_window) {
 	gtk_box_pack_start(GTK_BOX(bottom_wrapper), right_wrapper, TRUE, TRUE, 4);
 
 	gtk_box_pack_start(GTK_BOX(main_wrapper), upper_wrapper, FALSE, TRUE, 8);
-	gtk_box_pack_start(GTK_BOX(main_wrapper), bottom_wrapper, TRUE, TRUE, 8);
+	gtk_box_pack_start(GTK_BOX(main_wrapper), bottom_wrapper, TRUE, TRUE, 0);
 
 	gtk_container_add(GTK_CONTAINER(main_window), main_wrapper);
 	return;
