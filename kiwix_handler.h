@@ -31,7 +31,39 @@ int check_available_ports (int port_min, int port_max, int *port_number);
 pid_t get_program_process_id ();
 
 /**
- * 
+ * Get the zim files names in a given folder path,
+ * then returning the array of the names with the first value being 
+ * the length of the array
+ * @param{char *} folder_path - path of directory where the zim files are
+ * @return{char **} array with the names of the zim files
+ **/
+char **get_zim_files (char *folder_path);
+
+/**
+ * Generate a Kiwix Library File from a list of zim files 
+ * in the 'zim_file_folder' path
+ * @return{char *} path of the generated Kiwix Library File
+ **/
+char *generate_kiwix_library_file ();
+
+/**
+ * Gets the Kiwix Library File, 
+ * which is a list of all the available ZIM files.
+ * If the file is not available in 'XDG_DATA_HOME' as 'library.xml', 
+ * it will generate a new library file with the ZIM files 
+ * available in 'XDG_DATA_HOME/zim-files/'
+ * @return{char *} char allocated pointer of the library file path
+ **/
+char *get_kiwix_library_file ();
+
+/**
+ * Starts the Kiwix Server, 
+ * first checks for an available port
+ * second, gets the program pid in order to link 
+ * the shutdown of the server with the termination of the program
+ * third, gets the Kiwix Library File, or creates one if needed
+ * fourth, runs the server. Enjoy!
+ * @return{void}
  **/
 void start_server ();
 

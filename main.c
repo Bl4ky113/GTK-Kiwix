@@ -9,11 +9,14 @@
  * =====================================================================================
  */
 
-// Std and Libc Libs
+// GNU Libc Libs
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <dirent.h>
+#include <regex.h>
+#include <time.h>
 
 // GTK GUI Libs
 #include <gtk/gtk.h>
@@ -44,6 +47,8 @@ char *APP_FOLDER = "gtk-kiwix/";
  * @returns {int}
  **/
 int main (int argc, char **argv) {
+	// Check User Config
+
 	// Start Kiwix Server
 	start_server();
 
