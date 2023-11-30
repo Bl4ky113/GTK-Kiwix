@@ -14,12 +14,20 @@
 #include <gio/gio.h>
 #include <webkit2/webkit2.h>
 
-#include <stdlib.h>
+#include <consts.h>
+#include <gtk_gui.h>
 
-#define MAIN_TITLE "GTK Implementation of Kiwix"
+#include <kiwix_handler.h>
 
+/**
+ * Activates the main Window of the GTK App.
+ * Resizes it to 3/4ths of the monitor display, and centers it.
+ * @param{GtkApplication *} app - Main App of the Program
+ * @return{void}
+ **/
 void activate_gui (GtkApplication *app) {
 	GtkWidget *window = NULL;
+
 	GdkDisplay *display = NULL;
 	GdkMonitor *monitor = NULL;
 	GdkRectangle *geometry;
@@ -45,6 +53,13 @@ void activate_gui (GtkApplication *app) {
 	return;
 }
 
+/**
+ * Inits the GTK Application and GUI, 
+ * once activated, activates the rest of the GUI
+ * @param{int} argc - number of arguments passed to the program
+ * @param{char **} argv - vector of the arguments passed to the program
+ * @return {int} GTK Application Status
+ **/
 int init_gui (int argc, char **argv) {
 	GtkApplication *app = NULL;
 	int status = 0;

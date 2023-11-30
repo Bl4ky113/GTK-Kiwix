@@ -18,7 +18,10 @@
 int init_gui (int argc, char **argv);
 
 /**
- *
+ * Activates the main Window of the GTK App.
+ * Resizes it to 3/4ths of the monitor display, and centers it.
+ * @param{GtkApplication *} app - Main App of the Program
+ * @return{void}
  **/
 void activate_gui (GtkApplication *app);
 

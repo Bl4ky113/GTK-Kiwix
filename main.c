@@ -15,27 +15,37 @@
 #include <unistd.h>
 #include <string.h>
 
-// GTK Libs
+// GTK GUI Libs
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 #include <gio/gio.h>
 #include <webkit2/webkit2.h>
 
+// Server, Net, Ports and such Libs
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+
+#include <kiwix_handler.h>
 #include <gtk_gui.h>
 
 // Enviroment Global Variables
 char *XDG_DATA_HOME = "";
+char *XDG_CONFIG_HOME = "";
 char *APP_FOLDER = "gtk-kiwix/";
 
-// Kiwix Server Global Variables
-int kiwix_server_port = 1024;
-
 /**
+ * Main function of the Program. 
+ * First, checks and searches for custom Config, Share and some Envars
+ * Second, starts the Kiwix Server,
+ * Third, inits the GTK GUI
  * @param {int} argc - number of arguments passed to the program
  * @param {char **} argv - list of strings with the args of the program
  * @returns {int}
  **/
 int main (int argc, char **argv) {
+	// Start Kiwix Server
+	start_server();
 
 	// Init GTK GUI
 	init_gui(argc, argv);
