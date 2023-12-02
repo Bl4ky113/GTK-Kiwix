@@ -107,7 +107,7 @@ void generate_user_config () {
 void check_user_config () {
 	char *config_file_path = (char *) calloc(PATH_BUFFER, sizeof(char));
 
-	get_env_variables();
+	/*get_env_variables();*/
 
 	/*strcat(config_file_path, XDG_CONFIG_HOME);*/
 	/*strcat(config_file_path, "init.conf");*/

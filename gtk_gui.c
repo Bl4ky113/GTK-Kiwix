@@ -153,22 +153,22 @@ void add_content_upper_section (GtkWidget *wrapper) {
 	GtkWidget *button_refresh = NULL;
 
 	buttons_left_wrapper = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
-	/*button_prev = gtk_button_new_from_icon_name("gtk-go-back", GTK_ICON_SIZE_LARGE_TOOLBAR);*/
-	/*button_next = gtk_button_new_from_icon_name("gtk-go-forward", GTK_ICON_SIZE_LARGE_TOOLBAR);*/
+	button_prev = gtk_button_new_from_icon_name("gtk-go-back", GTK_ICON_SIZE_LARGE_TOOLBAR);
+	button_next = gtk_button_new_from_icon_name("gtk-go-forward", GTK_ICON_SIZE_LARGE_TOOLBAR);
 
 	buttons_right_wrapper = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
 	button_menu = gtk_button_new_from_icon_name("gtk-properties", GTK_ICON_SIZE_LARGE_TOOLBAR);
 	button_fullscreen = gtk_button_new_from_icon_name("gtk-fullscreen", GTK_ICON_SIZE_LARGE_TOOLBAR);
 	button_refresh = gtk_button_new_from_icon_name("gtk-refresh", GTK_ICON_SIZE_LARGE_TOOLBAR);
 
-	/*g_signal_connect(button_prev, "clicked", G_CALLBACK(cb_get_prev_url), NULL);*/
-	/*g_signal_connect(button_next, "clicked", G_CALLBACK(cb_get_next_url), NULL);*/
+	g_signal_connect(button_prev, "clicked", G_CALLBACK(cb_get_prev_url), NULL);
+	g_signal_connect(button_next, "clicked", G_CALLBACK(cb_get_next_url), NULL);
 
 	g_signal_connect(button_fullscreen, "clicked", G_CALLBACK(cb_make_window_fullscreen), NULL);
 	g_signal_connect(button_refresh, "clicked", G_CALLBACK(cb_refresh_library), NULL);
 
-	/*gtk_box_pack_start(GTK_BOX(buttons_left_wrapper), button_prev, TRUE, TRUE, 2);*/
-	/*gtk_box_pack_start(GTK_BOX(buttons_left_wrapper), button_next, TRUE, TRUE, 2);*/
+	gtk_box_pack_start(GTK_BOX(buttons_left_wrapper), button_prev, TRUE, TRUE, 2);
+	gtk_box_pack_start(GTK_BOX(buttons_left_wrapper), button_next, TRUE, TRUE, 2);
 
 	gtk_box_pack_end(GTK_BOX(buttons_right_wrapper), button_menu, TRUE, TRUE, 2);
 	gtk_box_pack_end(GTK_BOX(buttons_right_wrapper), button_fullscreen, TRUE, TRUE, 2);
