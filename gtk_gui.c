@@ -48,6 +48,85 @@ void add_webview_to_notebook (GtkWidget *notebook) {
 }
 
 /**
+ * Callback for the 'button_menu'
+ * Opens up a dialog with the app information like
+ * version, usage and licence.
+ * @return{void}
+ **/
+void cb_open_info () {
+	GtkWidget *about_dialog = NULL;
+
+	const char dev_title[] = "Developer";
+	const char **devs = alloca(sizeof(char *) * 2);
+	devs[0] = "Martín Hernández";
+	devs[1] = NULL;
+
+	const char wiki_title[] = "Original Project";
+	const char **wiki_names = alloca(sizeof(char *) * 4);
+	wiki_names[0] = "Wikipedia";
+	wiki_names[1] = "Wikimedia Foundation";
+	wiki_names[2] = "Kiwix";
+	wiki_names[3] = NULL;
+
+	about_dialog = gtk_about_dialog_new();
+	
+	gtk_about_dialog_set_logo_icon_name(
+		GTK_ABOUT_DIALOG(about_dialog),
+		"gtk-orientation-portrait"
+	);
+
+	gtk_about_dialog_set_license_type(
+		GTK_ABOUT_DIALOG(about_dialog),
+		GTK_LICENSE_GPL_3_0
+	);
+
+	gtk_about_dialog_set_program_name(
+		GTK_ABOUT_DIALOG(about_dialog),
+		"GTK implementation of Kiwix"
+	);
+
+	gtk_about_dialog_set_version(
+		GTK_ABOUT_DIALOG(about_dialog),
+		"v1.0"
+	);
+
+	gtk_about_dialog_set_website(
+		GTK_ABOUT_DIALOG(about_dialog),
+		"https://github.com/Bl4ky113/GTK-Kiwix"
+	);
+
+	gtk_about_dialog_set_website_label(
+		GTK_ABOUT_DIALOG(about_dialog),
+		"GTK Implementation of Kiwix in GitHub"
+	);
+
+	gtk_about_dialog_set_authors(
+		GTK_ABOUT_DIALOG(about_dialog),
+		devs
+	);
+
+	gtk_about_dialog_set_authors(
+		GTK_ABOUT_DIALOG(about_dialog),
+		devs
+	);
+
+	gtk_about_dialog_add_credit_section(
+		GTK_ABOUT_DIALOG(about_dialog),
+		dev_title,
+		devs
+	);
+
+	gtk_about_dialog_add_credit_section(
+		GTK_ABOUT_DIALOG(about_dialog),
+		wiki_title,
+		wiki_names
+	);
+
+	gtk_widget_show_all(about_dialog);
+	return;
+}
+
+/**
  * Callback for 'button_prev'
  * Takes WebViewer to the previous url 
  * in the urls list if available
@@ -78,6 +157,8 @@ void cb_get_next_url () {
 void cb_destroy_window (GtkWidget *dialog) {
 	gtk_widget_destroy(dialog);
 	gtk_widget_destroy(window_ptr);
+
+	g_print("RESTARTING APP\n");
 	return;
 }
 
@@ -92,6 +173,8 @@ void cb_refresh_library () {
 	GtkWidget *dialog = NULL;
 	GtkWidget *dialog_content = NULL;
 	GtkWidget *dialog_wrapper = NULL;
+	GtkWidget *label_wrapper = NULL;
+	GtkWidget *btn_wrapper = NULL;
 	GtkWidget *label = NULL;
 	GtkWidget *dialog_button = NULL;
 
@@ -104,11 +187,16 @@ void cb_refresh_library () {
 	dialog = gtk_dialog_new();
 	dialog_content = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 	dialog_wrapper = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
+	label_wrapper = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
+	btn_wrapper = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
 	label = gtk_label_new("The Kiwix Library has changed, please restart the application.");
 	dialog_button = gtk_button_new_with_label("Restart Application");
 
-	gtk_box_pack_start(GTK_BOX(dialog_wrapper), label, TRUE, TRUE, 4);
-	gtk_box_pack_end(GTK_BOX(dialog_wrapper), dialog_button, TRUE, TRUE, 4);
+	gtk_box_pack_start(GTK_BOX(label_wrapper), label, TRUE, TRUE, 4);
+	gtk_box_pack_end(GTK_BOX(btn_wrapper), dialog_button, FALSE, FALSE, 4);
+
+	gtk_box_pack_start(GTK_BOX(dialog_wrapper), label_wrapper, TRUE, TRUE, 0);
+	gtk_box_pack_end(GTK_BOX(dialog_wrapper), btn_wrapper, FALSE, FALSE, 8);
 
 	g_signal_connect(dialog_button, "clicked", G_CALLBACK(cb_destroy_window), dialog);
 
@@ -157,13 +245,14 @@ void add_content_upper_section (GtkWidget *wrapper) {
 	button_next = gtk_button_new_from_icon_name("gtk-go-forward", GTK_ICON_SIZE_LARGE_TOOLBAR);
 
 	buttons_right_wrapper = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
-	button_menu = gtk_button_new_from_icon_name("gtk-properties", GTK_ICON_SIZE_LARGE_TOOLBAR);
+	button_menu = gtk_button_new_from_icon_name("gtk-about", GTK_ICON_SIZE_LARGE_TOOLBAR);
 	button_fullscreen = gtk_button_new_from_icon_name("gtk-fullscreen", GTK_ICON_SIZE_LARGE_TOOLBAR);
 	button_refresh = gtk_button_new_from_icon_name("gtk-refresh", GTK_ICON_SIZE_LARGE_TOOLBAR);
 
 	g_signal_connect(button_prev, "clicked", G_CALLBACK(cb_get_prev_url), NULL);
 	g_signal_connect(button_next, "clicked", G_CALLBACK(cb_get_next_url), NULL);
 
+	g_signal_connect(button_menu, "clicked", G_CALLBACK(cb_open_info), NULL);
 	g_signal_connect(button_fullscreen, "clicked", G_CALLBACK(cb_make_window_fullscreen), NULL);
 	g_signal_connect(button_refresh, "clicked", G_CALLBACK(cb_refresh_library), NULL);
 

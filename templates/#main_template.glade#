@@ -20,7 +20,7 @@
                 <property name="can-focus">False</property>
                 <child>
                   <object class="GtkButton">
-                    <property name="label">gtk-about</property>
+                    <property name="label">gtk-orientation-portrait</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
@@ -74,7 +74,30 @@
                     <property name="can-focus">False</property>
                     <property name="selection-mode">multiple</property>
                     <child type="placeholder">
-                      <placeholder/>
+                      <object class="GtkButton">
+                        <property name="label" translatable="yes">button</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkListBoxRow">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkListBoxRow">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </object>
                     </child>
                   </object>
                   <packing>
