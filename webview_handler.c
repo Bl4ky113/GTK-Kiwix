@@ -71,11 +71,14 @@ void set_url_to_kiwix_server (WebKitWebView *webview) {
 	port = get_kiwix_server_port();
 	sprintf(port_str, "%d", port);
 
-	strcat(kiwix_server_url, SERVER_METHOD);
-	strcat(kiwix_server_url, HOSTNAME);
-	strcat(kiwix_server_url, ":");
-	strcat(kiwix_server_url, port_str);
-	strcat(kiwix_server_url, "/");
+	kiwix_server_url = concat(
+		SERVER_METHOD,
+		HOSTNAME,
+		":",
+		port_str,
+		"/",
+		NULL
+	);
 
 	webkit_web_view_load_uri(webview, kiwix_server_url);
 	init_url_double_linked_list(kiwix_server_url);

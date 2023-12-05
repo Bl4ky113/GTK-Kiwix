@@ -13,6 +13,15 @@
 #define KIWIX_HANDLER_H
 
 /**
+ * Function that takes multiple strings as arguments, then adds them in a single string
+ * the function stops adding stings until a NULL argument is passed
+ * *This function is more optimal than using multiple strcat, or strcat at all
+ * @param{char *str ...} Strings to concat, multiple args can be passed. LAST ARG MUST BE NULL
+ * @return{char *} Concated passed Strings
+ **/
+char *concat (const char *string, ... );
+
+/**
  * Checks if there's any port avaialable in a determined range,
  * creating a socket, checking if it's available by binding it, and finaly closing it,
  * if there's any available, will change the {int *} 'port_number' by dereference to the available port number.
@@ -21,7 +30,7 @@
  * @param{int *} port_number - dereference available port variable, 0 if there's none
  * @return{int} boolean int, true if there's an available port, false otherwise
  **/
-int check_available_ports (int port_min, int port_max, int *port_number);
+int check_available_ports (const int port_min, const int port_max, int *port_number);
 
 
 /**
@@ -37,7 +46,7 @@ pid_t get_program_process_id ();
  * @param{char *} folder_path - path of directory where the zim files are
  * @return{char **} array with the names of the zim files
  **/
-char **get_zim_files (char *folder_path);
+char **get_zim_files (const char *folder_path);
 
 /**
  * Generate a Kiwix Library File from a list of zim files 
@@ -72,7 +81,7 @@ void start_server ();
  * using the passed localhost port and 
  * @return{int} Status of the Server: 0 Fine; 1 Not Fine
  **/
-int run_server (int port, int program_pid, char *library_path);
+int run_server (const int port, const int program_pid, const char *library_path);
 
 /**
  * Method that refreshes the 'kiwix library file' from the GUI,

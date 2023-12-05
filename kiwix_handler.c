@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdarg.h>
 #include <string.h>
 #include <dirent.h>
 #include <regex.h>
@@ -28,10 +29,73 @@ int kiwix_server_port = 0;
 int number_zim_files = 0;
 
 /**
+ * Function that takes multiple strings as arguments, then adds them in a single string
+ * the function stops adding stings until a NULL argument is passed
+ * *This function is more optimal than using multiple strcat, or strcat at all
+ * @param{char *str ...} Strings to concat, multiple args can be passed. LAST ARG MUST BE NULL
+ * @return{char *} Concated passed Strings
+ **/
+char *concat (const char *string, ... ) {
+	char *str_result = NULL;
+	size_t str_mem_allocated = 32;
+
+	str_result = (char *) malloc(str_mem_allocated);
+	memset(str_result, 0, str_mem_allocated);
+
+	if (str_result == NULL) {
+		fprintf(stderr, "Concat String Memory allocation failed");
+		return NULL;
+	}
+
+	va_list str_params;
+	size_t str_result_size = 0;
+	char *str_ptr = NULL;
+
+	va_start(str_params, string);
+	
+	for (const char *str = string; str != NULL; str = va_arg(str_params, const char *)) {
+		size_t str_len = strlen(str);
+
+		if (str_result_size + str_len + 1 > str_mem_allocated) {
+			str_mem_allocated += str_len;
+			str_ptr = reallocarray(str_result, str_mem_allocated, 2);
+			str_mem_allocated *= 2;
+
+			if (str_ptr == NULL) {
+				free(str_result);
+
+				fprintf(stderr, "String Ptr Memory allocation failed");
+				return NULL;
+			}
+
+			str_result = str_ptr;
+		}
+
+		memcpy(str_result + str_result_size, str, str_len);
+
+		str_result_size += str_len;
+	}
+
+	str_result[str_result_size++] = '\0';
+	str_ptr = realloc(str_result, str_result_size);
+
+	if (str_ptr == NULL) {
+		fprintf(stderr, "String Ptr Memory Reallocation Failed");
+		return NULL;
+	}
+
+	str_result = str_ptr;
+
+	va_end(str_params);
+	return str_result;
+}
+
+/**
  * Gets the program (gtk-kiwix) process ID
  * @return{pid_t} Program Process ID
  **/
 pid_t get_program_process_id () {
+	// I swear to god, that I thought that this would have been more complex.
 	pid_t pid;
 
 	pid = getpid();
@@ -48,7 +112,7 @@ pid_t get_program_process_id () {
  * @param{int *} port_number - dereference available port variable, 0 if there's none
  * @return{int} boolean int, true if there's an available port, false otherwise
  **/
-int check_available_ports (int port_min, int port_max, int *port_number) {
+int check_available_ports (const int port_min, const int port_max, int *port_number) {
 	fprintf(stdout, "CHECKING FOR AVAILABLE PORTS IN %s", HOSTNAME);
 	
 	for (int port = port_min; port <= port_max; port++) {
@@ -56,7 +120,7 @@ int check_available_ports (int port_min, int port_max, int *port_number) {
 		int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
 		if (sockfd < 0) {
-			perror("ERROR socket NOT ASIGNED");
+			fprintf(stderr, "ERROR socket NOT ASIGNED");
 			continue; // Socket Error
 		}
 
@@ -73,7 +137,7 @@ int check_available_ports (int port_min, int port_max, int *port_number) {
 
 		if (close(sockfd) < 0) {
 			// Socket didn't close, check for the next one
-			perror("ERROR socket DIDN'T CLOSE PROPERLY");
+			fprintf(stderr, "ERROR socket DIDN'T CLOSE PROPERLY");
 			continue;
 		}
 
@@ -92,7 +156,7 @@ int check_available_ports (int port_min, int port_max, int *port_number) {
  * @param{char *} folder_path - path of directory where the zim files are
  * @return{char **} array with the names of the zim files
  **/
-char **get_zim_files (char *folder_path) {
+char **get_zim_files (const char *folder_path) {
 	char **zim_files_names = (char **) malloc(sizeof(char*) * DYNAMIC_ARRAY_BUFFER);
 	char zim_file_counter_str[INT_STRING_BUFFER]; 
 	struct dirent *folder_content = NULL;
@@ -108,7 +172,7 @@ char **get_zim_files (char *folder_path) {
 	zim_folder = opendir(folder_path);
 
 	if (!zim_folder) {
-		perror("THERE'S NO zim files FOLDER. EXIT\n");
+		fprintf(stderr, "THERE'S NO zim files FOLDER. EXIT\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -120,6 +184,8 @@ char **get_zim_files (char *folder_path) {
 			// Directory references, continue
 			continue;
 		}
+
+		fprintf(stdout, "\t%s\n", folder_content->d_name);
 		
 		zim_files_names[zim_file_counter++] = folder_content->d_name;
 
@@ -147,10 +213,10 @@ char **get_zim_files (char *folder_path) {
  **/
 char *generate_kiwix_library_file () {
 	char **zim_file_names = NULL;
-	char *share_path = (char *) malloc(sizeof(char) * PATH_BUFFER);
 	char *library_path = (char *) malloc(sizeof(char) * PATH_BUFFER);
-	char *zim_folder_path = (char *) malloc(sizeof(char) * PATH_BUFFER);
-	char zim_files_length_str[INT_STRING_BUFFER];
+	char *share_path = (char *) alloca(sizeof(char) * PATH_BUFFER);
+	char *zim_folder_path = (char *) alloca(sizeof(char) * PATH_BUFFER);
+	char *zim_files_length_str = NULL;
 	long zim_files_length = 0;
 
 	fprintf(stdout, "CHECKING FOR zim files TO GENERATE kiwix library file\n");
@@ -161,10 +227,14 @@ char *generate_kiwix_library_file () {
 
 	// If there's less than one element, 
 	// the length of the array, exit
-	strcat(zim_files_length_str, zim_file_names[0]);
+	zim_files_length_str = concat(
+		zim_files_length_str, 
+		zim_file_names[0],
+		NULL
+	);
 	zim_files_length = strtol(zim_files_length_str, NULL, 10);
 	if (zim_files_length <= 1) {
-		perror("NO zim files AVAILABLE. EXIT");
+		fprintf(stderr, "NO zim files AVAILABLE. EXIT");
 		exit(EXIT_FAILURE);
 	}
 	
@@ -174,26 +244,29 @@ char *generate_kiwix_library_file () {
 
 	for (int i = 1; i < zim_files_length; i++) {
 		FILE *kiwix_manage_pipe = NULL;
-		char pipe_command[PIPE_BUFFER] = "";
+		char *pipe_command = NULL;
 		char pipe_output[PIPE_BUFFER] = "";
 
-		strcat(pipe_command, KIWIX_MANAGE_PATH);
-		strcat(pipe_command, share_path);
-		strcat(pipe_command, "library.xml");
-		strcat(pipe_command, " add ");
-		strcat(pipe_command, zim_folder_path);
-		strcat(pipe_command, zim_file_names[i]);
+		pipe_command = concat(
+			KIWIX_MANAGE_PATH,
+			share_path,
+			"library.xml",
+			" add ",
+			zim_folder_path,
+			zim_file_names[i],
+			NULL
+		);
 
 		kiwix_manage_pipe = popen(pipe_command, "r");
 
 		if (kiwix_manage_pipe == NULL) {
-			perror("ERROR EXECUTING kiwix-manage");
+			fprintf(stderr, "ERROR EXECUTING kiwix-manage");
 			continue;
 		}
 
 		while (fgets(pipe_output, sizeof(pipe_output), kiwix_manage_pipe) != NULL) {
 			if (strlen(pipe_output) >= 1) {
-				perror("ERROR EXECUTING kiwix-manage");
+				fprintf(stderr, "ERROR EXECUTING kiwix-manage");
 				continue;
 			}
 		}
@@ -201,8 +274,11 @@ char *generate_kiwix_library_file () {
 		pclose(kiwix_manage_pipe);
 	}
 
-	strcat(library_path, share_path);
-	strcat(library_path, "library.xml");
+	library_path = concat(
+		share_path,
+		"library.xml",
+		NULL
+	);
 
 	fprintf(stdout, "SUCCESSFULLY CREATED kiwix library IN %s file VIA %s", library_path, KIWIX_MANAGE_PATH);
 
@@ -241,11 +317,11 @@ char *get_kiwix_library_file () {
  * using the passed localhost port and 
  * @return{int} Status of the Server: 0 Fine; 1 Not Fine
  **/
-int run_server (int port, int program_pid, char *library_path) {
+int run_server (const int port, const int program_pid, const char *library_path) {
 	FILE *kiwix_serve_pipe = NULL;
 	char port_str[INT_STRING_BUFFER] = "";
 	char program_pid_str[INT_STRING_BUFFER] = "";
-	char pipe_command[PIPE_BUFFER] = "";
+	char *pipe_command;
 	char pipe_output[PIPE_BUFFER] = "";
 	char success_msg_str[REGEX_BUFFER] = "running";
 	char error_msg_str[REGEX_BUFFER] = "Unable";
@@ -257,25 +333,30 @@ int run_server (int port, int program_pid, char *library_path) {
 	sprintf(program_pid_str, "%d", program_pid);
 
 	if (regcomp(&success_msg_regex, success_msg_str, REG_ICASE | REG_NOSUB)) {
-		perror("ERROR IN REGEX COMPILATION");
+		fprintf(stderr, "ERROR IN REGEX COMPILATION");
 		status = 1;
 		exit(EXIT_FAILURE);
 	} 
 
 	if (regcomp(&error_msg_regex, error_msg_str, REG_ICASE | REG_NOSUB)) {
-		perror("ERROR IN REGEX COMPILATION");
+		fprintf(stderr, "ERROR IN REGEX COMPILATION");
 		status = 1;
 		exit(EXIT_FAILURE);
 	}
 
-	strcat(pipe_command, KIWIX_SERVE_PATH);
-	strcat(pipe_command, " --library ");
-	strcat(pipe_command, library_path);
-	strcat(pipe_command, " -p ");
-	strcat(pipe_command, port_str);
-	strcat(pipe_command, " --attachToProcess=");
-	strcat(pipe_command, program_pid_str);
-	strcat(pipe_command, " -d");
+	pipe_command = concat(
+		KIWIX_SERVE_PATH, 
+		" --library ", 
+		library_path, 
+		" -p ", 
+		port_str,
+		" --attachToProcess=",
+		program_pid_str,
+		" -d ",
+		NULL
+	);
+
+	printf("HERE:%s\n", pipe_command);
 
 	kiwix_serve_pipe = popen(pipe_command, "r");
 
@@ -285,7 +366,7 @@ int run_server (int port, int program_pid, char *library_path) {
 			fprintf(stdout, "KIWIX SERVER RUNNING in http://%s:%d/\n", HOSTNAME, port);
 			break;
 		} else if (regexec(&error_msg_regex, pipe_output, 0, NULL, 0) == 0) {
-			perror("ERROR KIWIX SERVER COULDN'T START");
+			fprintf(stderr, "ERROR KIWIX SERVER COULDN'T START");
 			status = 1;
 			exit(EXIT_FAILURE);
 		}
@@ -316,7 +397,7 @@ void start_server () {
 	fprintf(stdout, "CHECKING FOR AN AVAILABLE port\n");
 	is_available_port = check_available_ports(KIWIX_SERVER_PORT_MIN, KIWIX_SERVER_PORT_MAX, &kiwix_server_port);
 	if (!is_available_port) {
-		perror("NO AVAILABLE port FOR THE KIWIX SERVER. EXIT\n");
+		fprintf(stderr, "NO AVAILABLE port FOR THE KIWIX SERVER. EXIT\n");
 		exit(EXIT_FAILURE);
 	}
 	fprintf(stdout, "AVAILABLE port FOUND, USING port %d\n", kiwix_server_port);
@@ -332,7 +413,7 @@ void start_server () {
 	fprintf(stdout, "KIWIX SERVER PARAMATERS READY. STARTING TO RUN KIWIX SERVER\n");
 	server_status = run_server(kiwix_server_port, program_pid, library_path);
 	if (server_status != 0) {
-		perror("ERROR IN KIWIX SERVER");
+		fprintf(stderr, "ERROR IN KIWIX SERVER");
 		exit(EXIT_FAILURE);
 	}
 	fprintf(stdout, "KIWIX SERVER SUCCESSFULLY DEPLOYED\n");

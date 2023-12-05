@@ -2,6 +2,7 @@
 # Project Exports, Cache and such files
 *.pdf
 *.odt#
+*.odp#
 *.glade~
 
 # C files 

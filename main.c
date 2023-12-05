@@ -13,6 +13,8 @@
  *
  * WARNING
  * THIS PROGRAM __WILL__ __NOT__ __RUN__ in Windows
+ * WHY? This program is heavily dependant in WebKit2GTK, exactly with the WebView Widget,
+ * widget which IS NOT AVAILABLE FOR THE GTK VERSION OF WINDOWS
  *
  *********************************/
 
@@ -20,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdarg.h>
 #include <string.h>
 #include <dirent.h>
 #include <regex.h>
@@ -50,13 +53,20 @@
  **/
 int main (int argc, char **argv) {
 	// Check User Config
-	check_user_config();
+	fprintf(stdout, "START LOAD/CHECK USER CONFIG");
+	/*check_user_config();*/
+	fprintf(stdout, "DONE LOAD/CHECK USER CONFIG");
 
 	// Start Kiwix Server
+	fprintf(stdout, "SERVER SERVER CONFIG/START");
 	start_server();
+	fprintf(stdout, "DONE SERVER CONFIG/START");
 
 	// Init GTK GUI
+	fprintf(stdout, "STARTING GUI");
 	init_gui(argc, argv);
+	fprintf(stdout, "DONE STARTING GUI. NOW CLOSING GUI");
+	fprintf(stdout, "BYE BYE <3");
 
 	return 0;
 }
