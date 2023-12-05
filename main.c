@@ -53,20 +53,20 @@
  **/
 int main (int argc, char **argv) {
 	// Check User Config
-	fprintf(stdout, "START LOAD/CHECK USER CONFIG");
+	fprintf(stdout, "START LOAD/CHECK USER CONFIG\n");
 	/*check_user_config();*/
-	fprintf(stdout, "DONE LOAD/CHECK USER CONFIG");
+	fprintf(stdout, "DONE LOAD/CHECK USER CONFIG\n");
 
 	// Start Kiwix Server
-	fprintf(stdout, "SERVER SERVER CONFIG/START");
+	fprintf(stdout, "SERVER SERVER CONFIG/START\n");
 	start_server();
-	fprintf(stdout, "DONE SERVER CONFIG/START");
+	fprintf(stdout, "DONE SERVER CONFIG/START\n");
 
 	// Init GTK GUI
-	fprintf(stdout, "STARTING GUI");
+	fprintf(stdout, "STARTING GUI\n");
 	init_gui(argc, argv);
-	fprintf(stdout, "DONE STARTING GUI. NOW CLOSING GUI");
-	fprintf(stdout, "BYE BYE <3");
+	fprintf(stdout, "DONE STARTING GUI. NOW CLOSING GUI\n\n");
+	fprintf(stdout, "BYE BYE <3\n");
 
 	return 0;
 }

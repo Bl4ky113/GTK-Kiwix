@@ -12,7 +12,7 @@
 #ifndef CONSTNS_H
 #define CONSTNS_H
 
-#define DYNAMIC_ARRAY_BUFFER 16
+#define DYNAMIC_ARRAY_BUFFER 24
 #define INT_STRING_BUFFER 10
 #define REGEX_BUFFER 32
 #define TIME_BUFFER 26
@@ -36,6 +36,7 @@
 #define KIWIX_MANAGE_PATH "/usr/bin/kiwix-manage "
 #define KIWIX_SERVE_PATH "/usr/bin/kiwix-serve "
 #define PATH_BUFFER 96
+#define FILE_NAME_BUFFER 96
 #define ENV_BUFFER 32
 #define ENV_NAME_BUFFER 32
 

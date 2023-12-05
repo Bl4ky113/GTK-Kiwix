@@ -26,7 +26,7 @@
 #include <consts.h>
 
 int kiwix_server_port = 0;
-int number_zim_files = 0;
+int number_zim_file = 0;
 
 /**
  * Function that takes multiple strings as arguments, then adds them in a single string
@@ -156,8 +156,8 @@ int check_available_ports (const int port_min, const int port_max, int *port_num
  * @param{char *} folder_path - path of directory where the zim files are
  * @return{char **} array with the names of the zim files
  **/
-char **get_zim_files (const char *folder_path) {
-	char **zim_files_names = (char **) malloc(sizeof(char*) * DYNAMIC_ARRAY_BUFFER);
+char **get_zim_file (const char *folder_path) {
+	char **zim_file_names = (char **) malloc(sizeof(char*) * DYNAMIC_ARRAY_BUFFER);
 	char zim_file_counter_str[INT_STRING_BUFFER]; 
 	struct dirent *folder_content = NULL;
 	DIR *zim_folder = NULL;
@@ -167,7 +167,7 @@ char **get_zim_files (const char *folder_path) {
 	fprintf(stdout, "GETTING zim file names IN %s FOLDER\n", folder_path);
 
 	sprintf(zim_file_counter_str, "%d", zim_file_counter);
-	zim_files_names[zim_file_index++] = zim_file_counter_str;
+	zim_file_names[zim_file_index++] = zim_file_counter_str;
 
 	zim_folder = opendir(folder_path);
 
@@ -177,6 +177,18 @@ char **get_zim_files (const char *folder_path) {
 	}
 
 	while ((folder_content = readdir(zim_folder)) != NULL) {
+		if (zim_file_counter >= DYNAMIC_ARRAY_BUFFER) {
+			// number of zim files greater than the dynamic array buffer
+			// increment the buffer by multiplying it by 4
+			// counter * 4; 16 * 4 = 64; 32 * 4 = 128; ...
+			zim_file_names = (char **) realloc(zim_file_names, zim_file_counter * 4);
+
+			if (zim_file_names == NULL) {
+				fprintf(stderr, "zim_file_names DIDN'T REALLOC CORRECTLY");
+				exit(EXIT_FAILURE);
+			}
+		}
+
 		if (
 				(strcmp(folder_content->d_name, ".") == 0) || 
 				(strcmp(folder_content->d_name, "..") == 0)
@@ -185,25 +197,22 @@ char **get_zim_files (const char *folder_path) {
 			continue;
 		}
 
-		fprintf(stdout, "\t%s\n", folder_content->d_name);
+		char *zim_file = (char *) calloc(FILE_NAME_BUFFER, sizeof(char));
+		memcpy(zim_file, folder_content->d_name, sizeof(char) * FILE_NAME_BUFFER);
 		
-		zim_files_names[zim_file_counter++] = folder_content->d_name;
-
-		if (zim_file_counter >= DYNAMIC_ARRAY_BUFFER) {
-			// number of zim files greater than the dynamic array buffer
-			// increment the buffer by the power of 2
-			// counter * 2; 16 * 2 = 32; 32 * 2 = 64; ...
-			zim_files_names = (char **) realloc(zim_files_names, zim_file_counter * 2);
-		}
+		zim_file_names[zim_file_counter++] = zim_file;
 	}
 
-	number_zim_files = zim_file_counter;
+	number_zim_file = zim_file_counter;
 
 	sprintf(zim_file_counter_str, "%d", zim_file_counter);
-	zim_files_names[0] = zim_file_counter_str;
-	zim_files_names = (char **) realloc(zim_files_names, zim_file_counter);
 
-	return zim_files_names;
+	zim_file_names[0] = zim_file_counter_str;
+	zim_file_names = (char **) realloc(zim_file_names, zim_file_counter * sizeof(char *));
+
+	closedir(zim_folder);
+
+	return zim_file_names;
 }
 
 /**
@@ -213,66 +222,64 @@ char **get_zim_files (const char *folder_path) {
  **/
 char *generate_kiwix_library_file () {
 	char **zim_file_names = NULL;
+	FILE *kiwix_manage_pipe = NULL;
 	char *library_path = (char *) malloc(sizeof(char) * PATH_BUFFER);
 	char *share_path = (char *) alloca(sizeof(char) * PATH_BUFFER);
 	char *zim_folder_path = (char *) alloca(sizeof(char) * PATH_BUFFER);
-	char *zim_files_length_str = NULL;
-	long zim_files_length = 0;
+	char zim_file_length_str[INT_STRING_BUFFER] = "";
+	char pipe_output[PIPE_BUFFER] = "";
+	char *pipe_command = NULL;
+	long int zim_file_length = 0;
 
 	fprintf(stdout, "CHECKING FOR zim files TO GENERATE kiwix library file\n");
 
 	zim_folder_path = "/home/bl4ky/.local/share/gtk-kiwix/zim-files/";
 
-	zim_file_names = get_zim_files(zim_folder_path);
+	zim_file_names = get_zim_file(zim_folder_path);
 
-	// If there's less than one element, 
-	// the length of the array, exit
-	zim_files_length_str = concat(
-		zim_files_length_str, 
-		zim_file_names[0],
-		NULL
-	);
-	zim_files_length = strtol(zim_files_length_str, NULL, 10);
-	if (zim_files_length <= 1) {
+	memcpy(zim_file_length_str, zim_file_names[0], sizeof(char) * INT_STRING_BUFFER);
+	zim_file_length = strtol(zim_file_length_str, NULL, 10);
+
+	if (zim_file_length <= 1) {
 		fprintf(stderr, "NO zim files AVAILABLE. EXIT");
 		exit(EXIT_FAILURE);
 	}
 	
 	share_path = "/home/bl4ky/.local/share/gtk-kiwix/";
 
-	fprintf(stdout, "FOUND %d zim files, CREATING kiwix library file\n", zim_files_length);
+	fprintf(stdout, "FOUND %d zim files, CREATING kiwix library file\n", zim_file_length - 1);
 
-	for (int i = 1; i < zim_files_length; i++) {
-		FILE *kiwix_manage_pipe = NULL;
-		char *pipe_command = NULL;
-		char pipe_output[PIPE_BUFFER] = "";
+	pipe_command = concat(
+		KIWIX_MANAGE_PATH,
+		share_path,
+		"library.xml",
+		" add ",
+		NULL
+	);
 
+	for (int i = 1; i < zim_file_length; i++) {
 		pipe_command = concat(
-			KIWIX_MANAGE_PATH,
-			share_path,
-			"library.xml",
-			" add ",
+			pipe_command,
 			zim_folder_path,
 			zim_file_names[i],
+			" ",
 			NULL
 		);
-
-		kiwix_manage_pipe = popen(pipe_command, "r");
-
-		if (kiwix_manage_pipe == NULL) {
-			fprintf(stderr, "ERROR EXECUTING kiwix-manage");
-			continue;
-		}
-
-		while (fgets(pipe_output, sizeof(pipe_output), kiwix_manage_pipe) != NULL) {
-			if (strlen(pipe_output) >= 1) {
-				fprintf(stderr, "ERROR EXECUTING kiwix-manage");
-				continue;
-			}
-		}
-
-		pclose(kiwix_manage_pipe);
 	}
+
+	kiwix_manage_pipe = popen(pipe_command, "r");
+
+	if (kiwix_manage_pipe == NULL) {
+		fprintf(stderr, "ERROR EXECUTING kiwix-manage");
+	}
+
+	while (fgets(pipe_output, sizeof(pipe_output), kiwix_manage_pipe) != NULL) {
+		if (strlen(pipe_output) >= 1) {
+			fprintf(stderr, "ERROR EXECUTING kiwix-manage");
+		}
+	}
+
+	pclose(kiwix_manage_pipe);
 
 	library_path = concat(
 		share_path,
@@ -355,8 +362,6 @@ int run_server (const int port, const int program_pid, const char *library_path)
 		" -d ",
 		NULL
 	);
-
-	printf("HERE:%s\n", pipe_command);
 
 	kiwix_serve_pipe = popen(pipe_command, "r");
 
